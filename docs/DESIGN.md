@@ -1,0 +1,9 @@
+# usb-bouncer — Design
+
+Design notes and the reasoning behind the tool's key decisions. Each section documents a component: what it does, why it's built this way, and the tradeoffs that choice carries.
+
+## HID keystroke-timing detector
+
+The detector stays dormant until a new HID device attaches. When something claiming to be a keyboard shows up, it starts recording the timestamp of each key-down event — the time only, never the key itself. It keeps the last N timestamps in a fixed-size buffer, so as new keystrokes arrive, older ones drop off and nothing accumulates. From those timestamps it computes the median gap between consecutive keystrokes. A short fast run is probably fine; a burst that stays below the threshold across its whole length is what gets flagged.
+It records when you type, never what you type. The keycode is never read, so the content never enters the program at all — there is nothing to store, nothing to filter, nothing to send. That is a property you can check rather than a promise you have to trust: open the source, look at the event callback, and confirm kCGKeyboardEventKeycode never appears. Its absence is the guarantee.
+The median does the work of keeping false positives down. A stray fast keystroke or two would drag an average around; the median ignores those outliers and only moves when the fast typing is consistent. That matters because humans, even quick ones, leave texture in their typing — small pauses, uneven gaps between keys. An injection tool doesn't. It dumps its payload at a uniform machine speed with no letup, and it's that sustained, even, sub-threshold rhythm the detector is built to catch.
