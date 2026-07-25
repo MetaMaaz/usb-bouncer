@@ -22,4 +22,14 @@ has_storage is a cheap proxy rather than a claim about USB interface classes. sy
 
 The model also states what it leaves out. It does not retain keycodes, raw USB descriptor bytes, or timing histories beyond what each feature needs to reach its decision. That keeps the privacy boundary concrete and auditable, and marks the tool as a narrowly scoped device monitor rather than a full USB forensic collector.
 
-The one addition I made is the "worse than useless" line in the fingerprint paragraph, which is the failure-mode sentence you'd earned but hadn't written down. Drop it if you find it too blunt for the doc's tone. Otherwise this is ready to commit.
+## Event sources and staged collection
+
+usb-bouncer starts by polling system_profiler rather than going directly to IOKit because it separates detection from operating-system plumbing. system_profiler supplies useful device-level fields with no extra dependencies, and its JSON output can be saved as fixtures for repeatable unit tests. That lets the parser, Device model, rule engine, and event writer be built and tested as pure logic before the project takes on code that subscribes to live macOS hardware events.
+
+This first source is the weakest of the three, and that is an acceptable starting point because of what it buys in testability. It reports device information but not reliable USB interface-class descriptors. It cannot establish whether a device presents both mass-storage and HID interfaces, so v0.1 falls back on weaker proxies such as the mounted-volume has_storage flag. The cost is polling latency: a device can be connected for some time before the next poll notices it. Polling also produces snapshots rather than lifecycle events, so usb-bouncer infers attachment and removal by comparing each snapshot against the previous one.
+
+The v0.2 stage moves to ioreg, which fills the specific gap system_profiler leaves: it exposes bInterfaceClass values. Rules such as storage-plus-HID can then reason about what a device actually declares, rather than relying on the mounted-volume proxy that v0.1 depends on. The reason this is its own stage, rather than jumping straight to IOKit, is that ioreg is still pollable and dependency-free. It closes the data gap without taking on the real-time, pyobjc-based complexity that v0.3 introduces.
+
+IOKit is the final stage. It provides real-time attach and detach notifications, which removes polling delay and ends the need to infer lifecycle changes from snapshot diffs.
+
+The staged approach is what keeps the analyzer independent of each collector. Each source improves the quality and timeliness of what usb-bouncer observes, but the detection rules never have to be rewritten to accommodate a stronger one.
