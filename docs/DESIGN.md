@@ -33,3 +33,15 @@ The v0.2 stage moves to ioreg, which fills the specific gap system_profiler leav
 IOKit is the final stage. It provides real-time attach and detach notifications, which removes polling delay and ends the need to infer lifecycle changes from snapshot diffs.
 
 The staged approach is what keeps the analyzer independent of each collector. Each source improves the quality and timeliness of what usb-bouncer observes, but the detection rules never have to be rewritten to accommodate a stronger one.
+
+## No-eval rule engine
+
+Rules in rules.yaml are not executable expressions. Passing configuration strings to eval() would turn the rule pack into a code-execution surface: a modified file, a deployment mistake, or a supply-chain compromise could make the security tool run arbitrary Python. That is a bad property for any tool, and a worse one for software meant to assess untrusted devices.
+
+Instead, rules.yaml carries metadata: each rule's weight, description, ATT&CK identifier, and enabled status. The checks themselves are ordinary Python functions, registered under stable IDs with @check("rule_id"). The analyzer uses the ID to find the matching function and pairs its result with that rule's metadata.
+
+This fixes the set of behaviours the tool can perform at code-review time. Configuration can enable, disable, and weight rules, but it cannot introduce a behaviour that is not already in the reviewed codebase.
+
+The reference analyzer currently skips a YAML rule that has no registered function: the lookup returns nothing and analysis continues. That is a limitation, not validation. A later version could check the YAML and registry IDs at startup and fail on any mismatch, but the design should not claim that behaviour until it exists.
+
+The split also keeps testing simple. Each check function can be unit-tested against a small constructed Device fixture, without parsing YAML or running the full analyzer. Separate tests cover the metadata, enabled flags, weights, and result assembly. Configuration changes cannot alter rule logic; they only decide whether a reviewed rule runs and how its finding is scored and reported.
