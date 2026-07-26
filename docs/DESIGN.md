@@ -45,3 +45,17 @@ This fixes the set of behaviours the tool can perform at code-review time. Confi
 The reference analyzer currently skips a YAML rule that has no registered function: the lookup returns nothing and analysis continues. That is a limitation, not validation. A later version could check the YAML and registry IDs at startup and fail on any mismatch, but the design should not claim that behaviour until it exists.
 
 The split also keeps testing simple. Each check function can be unit-tested against a small constructed Device fixture, without parsing YAML or running the full analyzer. Separate tests cover the metadata, enabled flags, weights, and result assembly. Configuration changes cannot alter rule logic; they only decide whether a reviewed rule runs and how its finding is scored and reported.
+
+## JSONL SIEM schema
+
+Each usb-bouncer event is written as one JSON object per line in ~/.usb-bouncer/events.jsonl. A record carries ts, event, a nested device object, verdict, score, rules_fired, attack_ids, and host.
+
+JSONL fits an append-only event log. New events are written without reading or rewriting earlier ones. An interrupted write may leave one malformed final line, but it damages at most that event; every preceding line stays independently valid and ingestible, and a SIEM can skip the bad line and continue. A single JSON array would mean managing commas and a closing bracket as the log grows, and CSV handles nested device data, string arrays like rules_fired and attack_ids, and optional fields poorly.
+
+The field names are a contract with anything that parses the log: the local SIEM mapping, later dashboards, detection rules, and investigation scripts. Once one of those depends on attack_ids, renaming it to attackIds can silently break searches and alerts, or split historical data across two fields. Additive changes are usually safe; renames and incompatible type changes need an explicit migration.
+
+ts uses ISO-8601 UTC so timestamps are unambiguous across hosts, time zones, daylight-saving changes, and SIEM deployments. The format reads cleanly to a human and still sorts correctly as a string, and UTC lets an investigator line usb-bouncer events up against endpoint, network, and identity logs without converting local time first. A Unix epoch is more compact but less inspectable, and easy to mishandle when someone assumes the wrong units.
+
+The nested device block carries the device fingerprint as a correlation key. As covered in the device data model, it lets analysts group repeated connections from the same reported attributes, spot a recurring device, and avoid reinvestigating one they have already cleared. It is not authentication or proof of physical identity: its inputs are device-reported and can be cloned or spoofed.
+
+Together, the line-per-event structure and the stable schema make direct SIEM ingestion predictable. An analyst can query for high-score device attachments on a host, or group events by fingerprint and ATT&CK ID to chase down recurring activity.
