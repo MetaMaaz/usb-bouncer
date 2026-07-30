@@ -5,8 +5,8 @@ types; everything downstream reads them. No collection logic here, and no
 imports from the rest of the package.
 """
 
-from dataclasses import dataclass
 import hashlib
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
