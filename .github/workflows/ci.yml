@@ -5,21 +5,45 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Test
+        run: pytest --cov=usb_bouncer --cov-report=term-missing --cov-report=xml
+      - name: Coverage summary
+        if: matrix.python-version == '3.11'
+        run: |
+          echo "### Coverage (Python ${{ matrix.python-version }})" >> "$GITHUB_STEP_SUMMARY"
+          coverage report >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+
+  static:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.14"
+          python-version: "3.11"
       - name: Install
         run: pip install -e ".[dev]"
       - name: Lint
         run: ruff check .
-      - name: Test
-        run: pytest --cov=usb_bouncer --cov-report=term-missing --cov-report=xml
-      - name: Coverage summary
-        run: |
-          echo "### Coverage" >> "$GITHUB_STEP_SUMMARY"
-          coverage report >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+      - name: Type check
+        run: pyright
