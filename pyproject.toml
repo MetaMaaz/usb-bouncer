@@ -25,6 +25,13 @@ packages = ["src/usb_bouncer"]
 line-length = 100
 target-version = "py311"
 
+[tool.pyright]
+typeCheckingMode = "standard"
+pythonVersion = "3.11"
+include = ["src", "tests"]
+exclude = ["**/node_modules", "**/__pycache__", "**/.*"]
+extraPaths = ["src"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
