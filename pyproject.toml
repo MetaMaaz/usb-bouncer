@@ -29,7 +29,6 @@ target-version = "py311"
 typeCheckingMode = "standard"
 pythonVersion = "3.11"
 include = ["src", "tests"]
-exclude = ["**/node_modules", "**/__pycache__", "**/.*"]
 extraPaths = ["src"]
 
 [tool.pytest.ini_options]
