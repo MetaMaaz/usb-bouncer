@@ -73,15 +73,16 @@ no notion of a device lying about its class.
 (0x03) when its form factor and other descriptors suggest storage is scored
 heavily.
 
-### 4.2 Keystroke injection — T1056.001 (Input Capture), T1059 (Command and Scripting Interpreter)
+### 4.2 Keystroke injection — T1056.001 (Input Capture) + T1059
 
 The classic Rubber Ducky pattern: once trusted as a keyboard, the device types a
 payload faster than any human could. T1056.001 covers the input-stream abuse;
 T1059 covers whatever the injected keystrokes actually execute.
 
 *Detection:* keystroke-timing analysis. Sustained inter-arrival times below a
-human threshold (~40 ms median over a rolling window) indicate a machine, not a
-person. See §7 for the privacy constraint on this detector.
+human threshold (~40 ms median over a rolling window) indicate a machine, not
+a person. See §6 for the attribution limit and §7 for the privacy constraint
+on this detector.
 
 ### 4.3 Composite device tricks — T1091 (Replication Through Removable Media) + T1200
 
@@ -140,8 +141,8 @@ SPUSBDataType` returns device-level fields (VID, PID, serial, manufacturer) but
 does not reliably expose `bInterfaceClass` for each interface. The
 "storage-class device that also presents HID" rule therefore cannot be built from
 `system_profiler` alone. v0.1.0 scopes to the checks that data supports; v0.2.0
-adds an `ioreg`-based interface enumerator to unlock it. The rule ships in
-`rules.yaml` from the start, correctly weighted, so the gap is visible in the
+adds an `ioreg`-based interface enumerator to unlock it. `rules.yaml` will carry
+the rule from the start, correctly weighted, so the gap stays visible in the
 config rather than hidden in the code.
 
 **The timing detector has an irreducible false-positive rate.** Fast human
@@ -150,6 +151,13 @@ all dip below the threshold briefly. This is why the detector requires a
 *sustained* burst rather than a single fast interval, and why both the threshold
 and the window length are configurable. A measured false-positive rate will be
 published in `docs/POSTMORTEM.md` after v1.0.
+
+**A timing finding cannot be pinned to a device.** The event tap sees one
+stream: everything typed in the session, from every attached keyboard and from
+the built-in one. It cannot tell you which of them produced a given burst. So a
+RED timing verdict means automated-looking typing happened while this device was
+attached. It does not mean this device did the typing. Read the descriptor
+evidence and the timing evidence together, not as separate verdicts.
 
 **Scoring is heuristic, not probabilistic.** The weights in `rules.yaml` are
 engineering judgement, not calibrated likelihoods. They are tunable precisely
@@ -163,6 +171,23 @@ event stream. **Mechanically, this is the same primitive a keylogger uses**, and
 that fact deserves to be stated plainly rather than buried.
 
 The detector records **only the arrival timestamp of each key-down event**, in a
-fixed-size ring buffer. It never reads `kCGKeyboardEventKeycode`. It cannot know
-which key was pressed, only that *a* key was pressed and *when*. The tap is
-created in listen-only mode, so it
+fixed-size ring buffer. Old timestamps get overwritten as new ones arrive, so
+the buffer never grows and no input history builds up across a run. It never
+reads `kCGKeyboardEventKeycode`, never writes event data to disk, never
+transmits it, and never puts typed content in a report. The tap runs in
+listen-only mode, so it cannot modify, suppress, or inject events.
+
+The detector needs macOS Accessibility permission, the OS gate for this kind of
+global tap. That is a serious permission to hand out. Grant it only to a build
+you trust, and revoke it when you are not running timing analysis.
+
+Reading the source and installing the tool are two different trust decisions.
+The source is there to inspect. A wheel pulled from a package index is not the
+thing you inspected. usb-bouncer does not ship as a signed application bundle,
+so the Accessibility prompt names an executable and gives you no code-signing
+identity to check against the source you read. Install from a published package
+and you are trusting the distribution path as well as the code.
+
+Nothing in the test suite enforces any of this today. No test fails if a future
+change starts reading keycodes. Until that test exists, the privacy property
+rests on source inspection rather than on anything mechanical.
