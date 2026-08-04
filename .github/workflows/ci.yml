@@ -47,3 +47,13 @@ jobs:
         run: ruff check .
       - name: Type check
         run: pyright
+
+  ci-ok:
+    if: always()
+    needs: [test, static]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify upstream jobs
+        run: |
+          [ "${{ needs.test.result }}" = "success" ] || exit 1
+          [ "${{ needs.static.result }}" = "success" ] || exit 1
