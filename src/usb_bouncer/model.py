@@ -48,3 +48,6 @@ class Device:
         """
         raw = f"{self.vendor_id}:{self.product_id}:{self.serial}:{self.location_id}"
         return hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+def _gate_check(x: int) -> int:
+    return "not an int"
