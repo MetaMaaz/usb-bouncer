@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Replace device serial numbers in a system_profiler fixture.
 
 Maintainer tool, not part of the package. Operates on the raw text so the
