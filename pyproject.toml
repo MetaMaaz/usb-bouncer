@@ -15,6 +15,9 @@ dependencies = ["pyyaml>=6", "rich>=13"]
 dev = ["pytest>=8", "pytest-cov>=5", "ruff==0.17.5", "pyright>=1.1.400"]
 realtime = ["pyobjc-framework-Quartz>=10", "pyobjc-framework-IOKit>=10"]
 
+[project.scripts]
+usb-bouncer = "usb_bouncer.cli:main"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/usb_bouncer"]
 
