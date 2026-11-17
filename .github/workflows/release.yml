@@ -24,7 +24,7 @@ jobs:
           ruff check .
           pyright
           pytest
-          pip-audit
+          pip-audit .
       - name: Build wheel and sdist
         run: python -m build
       - name: Create GitHub Release
