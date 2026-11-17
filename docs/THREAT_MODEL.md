@@ -90,8 +90,7 @@ A device exposing both mass-storage (0x08) and HID (0x03) interfaces: it mounts
 as a legitimate drive to allay suspicion, while the HID interface delivers the
 payload. This is the flagship rule.
 
-*Detection:* interface-class enumeration. See §6 — this rule is only fully
-functional from v0.2.0.
+*Detection:* interface-class enumeration. See §6 — this rule is cannot fire until v0.2.0.
 
 ### 4.4 VID/PID spoofing and descriptor inconsistency — T1200
 
@@ -136,11 +135,11 @@ detector sees a fast but human typist. Every indicator this tool relies on is
 attacker-controlled data. That is the fundamental ceiling of descriptor-based
 detection, and no amount of rule-tuning raises it.
 
-**The flagship rule is not fully functional in v0.1.0.** `system_profiler
-SPUSBDataType` returns device-level fields (VID, PID, serial, manufacturer) but
-does not reliably expose `bInterfaceClass` for each interface. The
-"storage-class device that also presents HID" rule therefore cannot be built from
-`system_profiler` alone. v0.1.0 scopes to the checks that data supports; v0.2.0
+**The flagship rule cannot fire in v0.1.0.** `system_profiler
+SPUSBHostDataType` returns device-level fields (VID, PID, serial number, link
+speed, location) but exposes no `bInterfaceClass` values and no indicator that a
+device presents mass storage. The "storage-class device that also presents HID"
+rule therefore has neither of its inputs from this source. v0.1.0 scopes to the checks that data supports; v0.2.0
 adds an `ioreg`-based interface enumerator to unlock it. `rules.yaml` will carry
 the rule from the start, correctly weighted, so the gap stays visible in the
 config rather than hidden in the code.

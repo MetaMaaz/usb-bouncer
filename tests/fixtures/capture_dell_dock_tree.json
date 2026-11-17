@@ -1,0 +1,160 @@
+{
+  "SPUSBHostDataType" : [
+    {
+      "_items" : [
+        {
+          "_items" : [
+            {
+              "_items" : [
+                {
+                  "_name" : "USB5744",
+                  "USBDeviceKeyLinkSpeed" : "5 Gb/s",
+                  "USBDeviceKeyProductID" : "0x5744",
+                  "USBDeviceKeyProductVersion" : "0x0286",
+                  "USBDeviceKeySerialNumber" : "Not Provided",
+                  "USBDeviceKeyVendorID" : "0x0424",
+                  "USBDeviceKeyVendorName" : "Microchip Tech",
+                  "USBKeyHardwareType" : "Removable",
+                  "USBKeyLocationID" : "0x01231000"
+                }
+              ],
+              "_name" : "Dell dock",
+              "USBDeviceKeyLinkSpeed" : "5 Gb/s",
+              "USBDeviceKeyProductID" : "0x0413",
+              "USBDeviceKeyProductVersion" : "0x0122",
+              "USBDeviceKeySerialNumber" : "Not Provided",
+              "USBDeviceKeyVendorID" : "0x0bda",
+              "USBDeviceKeyVendorName" : "Dell Inc.",
+              "USBKeyHardwareType" : "Non-removable",
+              "USBKeyLocationID" : "0x01230000"
+            },
+            {
+              "_name" : "USB 10/100/1000 LAN",
+              "USBDeviceKeyLinkSpeed" : "5 Gb/s",
+              "USBDeviceKeyPowerAllocation" : "1.44 W (288 mA)",
+              "USBDeviceKeyProductID" : "0x8153",
+              "USBDeviceKeyProductVersion" : "0x3111",
+              "USBDeviceKeySerialNumber" : "165852121",
+              "USBDeviceKeyVendorID" : "0x0bda",
+              "USBDeviceKeyVendorName" : "Realtek",
+              "USBKeyHardwareType" : "Removable",
+              "USBKeyLocationID" : "0x01240000"
+            }
+          ],
+          "_name" : "Dell dock",
+          "USBDeviceKeyLinkSpeed" : "10 Gb/s",
+          "USBDeviceKeyProductID" : "0x0487",
+          "USBDeviceKeyProductVersion" : "0x0157",
+          "USBDeviceKeySerialNumber" : "Not Provided",
+          "USBDeviceKeyVendorID" : "0x0bda",
+          "USBDeviceKeyVendorName" : "Dell Inc.",
+          "USBKeyHardwareType" : "Removable",
+          "USBKeyLocationID" : "0x01200000"
+        },
+        {
+          "_items" : [
+            {
+              "_items" : [
+                {
+                  "_name" : "Dell MS116 USB Optical Mouse",
+                  "USBDeviceKeyLinkSpeed" : "1.5 Mb/s",
+                  "USBDeviceKeyProductID" : "0x301a",
+                  "USBDeviceKeyProductVersion" : "0x0100",
+                  "USBDeviceKeySerialNumber" : "Not Provided",
+                  "USBDeviceKeyVendorID" : "0x413c",
+                  "USBDeviceKeyVendorName" : "PixArt",
+                  "USBKeyHardwareType" : "Removable",
+                  "USBKeyLocationID" : "0x01133000"
+                },
+                {
+                  "_name" : "Dell KB216 Wired Keyboard",
+                  "USBDeviceKeyLinkSpeed" : "1.5 Mb/s",
+                  "USBDeviceKeyProductID" : "0x2113",
+                  "USBDeviceKeyProductVersion" : "0x3308",
+                  "USBDeviceKeySerialNumber" : "Not Provided",
+                  "USBDeviceKeyVendorID" : "0x413c",
+                  "USBKeyHardwareType" : "Removable",
+                  "USBKeyLocationID" : "0x01132000"
+                },
+                {
+                  "_name" : "Dell dock",
+                  "USBDeviceKeyLinkSpeed" : "480 Mb/s",
+                  "USBDeviceKeyProductID" : "0xb06f",
+                  "USBDeviceKeyProductVersion" : "0x0101",
+                  "USBDeviceKeySerialNumber" : "Not Provided",
+                  "USBDeviceKeyVendorID" : "0x413c",
+                  "USBKeyHardwareType" : "Removable",
+                  "USBKeyLocationID" : "0x01135000"
+                },
+                {
+                  "_name" : "USB2744",
+                  "USBDeviceKeyLinkSpeed" : "480 Mb/s",
+                  "USBDeviceKeyProductID" : "0x2744",
+                  "USBDeviceKeyProductVersion" : "0x0286",
+                  "USBDeviceKeySerialNumber" : "Not Provided",
+                  "USBDeviceKeyVendorID" : "0x0424",
+                  "USBDeviceKeyVendorName" : "Microchip Tech",
+                  "USBKeyHardwareType" : "Removable",
+                  "USBKeyLocationID" : "0x01131000"
+                }
+              ],
+              "_name" : "Dell dock",
+              "USBDeviceKeyLinkSpeed" : "480 Mb/s",
+              "USBDeviceKeyProductID" : "0x5413",
+              "USBDeviceKeyProductVersion" : "0x0122",
+              "USBDeviceKeySerialNumber" : "Not Provided",
+              "USBDeviceKeyVendorID" : "0x0bda",
+              "USBDeviceKeyVendorName" : "Dell Inc.",
+              "USBKeyHardwareType" : "Non-removable",
+              "USBKeyLocationID" : "0x01130000"
+            },
+            {
+              "_name" : "Dell dock",
+              "USBDeviceKeyLinkSpeed" : "480 Mb/s",
+              "USBDeviceKeyProductID" : "0xb06e",
+              "USBDeviceKeyProductVersion" : "0x0101",
+              "USBDeviceKeySerialNumber" : "Not Provided",
+              "USBDeviceKeyVendorID" : "0x413c",
+              "USBKeyHardwareType" : "Removable",
+              "USBKeyLocationID" : "0x01150000"
+            }
+          ],
+          "_name" : "Dell dock",
+          "USBDeviceKeyLinkSpeed" : "480 Mb/s",
+          "USBDeviceKeyProductID" : "0x5487",
+          "USBDeviceKeyProductVersion" : "0x0157",
+          "USBDeviceKeySerialNumber" : "Not Provided",
+          "USBDeviceKeyVendorID" : "0x0bda",
+          "USBDeviceKeyVendorName" : "Dell Inc.",
+          "USBKeyHardwareType" : "Removable",
+          "USBKeyLocationID" : "0x01100000"
+        }
+      ],
+      "_name" : "USB 3.1 Bus",
+      "Driver" : "AppleT8132USBXHCI",
+      "USBKeyHardwareType" : "Built-in",
+      "USBKeyLocationID" : "0x01000000"
+    },
+    {
+      "_items" : [
+        {
+          "_name" : "iPhone",
+          "USBDeviceKeyLinkSpeed" : "480 Mb/s",
+          "USBDeviceKeyPowerAllocation" : "12 W (2400 mA)",
+          "USBDeviceKeyPowerSinkCapability" : "12 W (2400 mA)",
+          "USBDeviceKeyProductID" : "0x12a8",
+          "USBDeviceKeyProductVersion" : "0x1803",
+          "USBDeviceKeySerialNumber" : "3305017249642M3B4090158O",
+          "USBDeviceKeyVendorID" : "0x05ac",
+          "USBDeviceKeyVendorName" : "Apple Inc.",
+          "USBKeyHardwareType" : "Removable",
+          "USBKeyLocationID" : "0x00100000"
+        }
+      ],
+      "_name" : "USB 3.1 Bus",
+      "Driver" : "AppleT8132USBXHCI",
+      "USBKeyHardwareType" : "Built-in",
+      "USBKeyLocationID" : "0x00000000"
+    }
+  ]
+}

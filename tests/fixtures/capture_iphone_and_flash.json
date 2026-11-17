@@ -1,0 +1,45 @@
+{
+  "SPUSBHostDataType" : [
+    {
+      "_items" : [
+        {
+          "_name" : "iPhone",
+          "USBDeviceKeyLinkSpeed" : "480 Mb/s",
+          "USBDeviceKeyPowerAllocation" : "12 W (2400 mA)",
+          "USBDeviceKeyPowerSinkCapability" : "12 W (2400 mA)",
+          "USBDeviceKeyProductID" : "0x12a8",
+          "USBDeviceKeyProductVersion" : "0x1803",
+          "USBDeviceKeySerialNumber" : "1A2B3C4D5E6F708192A3B4C5",
+          "USBDeviceKeyVendorID" : "0x05ac",
+          "USBDeviceKeyVendorName" : "Apple Inc.",
+          "USBKeyHardwareType" : "Removable",
+          "USBKeyLocationID" : "0x01100000"
+        }
+      ],
+      "_name" : "USB 3.1 Bus",
+      "Driver" : "AppleT8132USBXHCI",
+      "USBKeyHardwareType" : "Built-in",
+      "USBKeyLocationID" : "0x01000000"
+    },
+    {
+      "_items" : [
+        {
+          "_name" : " SanDisk 3.2Gen1",
+          "USBDeviceKeyLinkSpeed" : "5 Gb/s",
+          "USBDeviceKeyPowerAllocation" : "4.48 W (896 mA)",
+          "USBDeviceKeyProductID" : "0x55a9",
+          "USBDeviceKeyProductVersion" : "0x0100",
+          "USBDeviceKeySerialNumber" : "01234567890123456789",
+          "USBDeviceKeyVendorID" : "0x0781",
+          "USBDeviceKeyVendorName" : " USB",
+          "USBKeyHardwareType" : "Removable",
+          "USBKeyLocationID" : "0x00200000"
+        }
+      ],
+      "_name" : "USB 3.1 Bus",
+      "Driver" : "AppleT8132USBXHCI",
+      "USBKeyHardwareType" : "Built-in",
+      "USBKeyLocationID" : "0x00000000"
+    }
+  ]
+}
