@@ -1,6 +1,21 @@
 # usb-bouncer
 
+[![CI](https://github.com/MetaMaaz/usb-bouncer/actions/workflows/ci.yml/badge.svg)](https://github.com/MetaMaaz/usb-bouncer/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/MetaMaaz/usb-bouncer)](https://github.com/MetaMaaz/usb-bouncer/releases)
+
 macOS tool that vets unknown USB devices for BadUSB red flags and keystroke injection.
+
+It is a detection aid, not a prevention control. It cannot block a device, and
+an attacker who clones a real device's identifiers and types at human speed
+gets past it. [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) says exactly what it
+catches and what it does not.
+
+## Install
+
+```bash
+pipx install git+https://github.com/MetaMaaz/usb-bouncer@v1.0.0
+pipx inject usb-bouncer pyobjc-framework-Quartz   # only for watch --hid
+```
 
 ## Status
 
@@ -16,8 +31,6 @@ design is in [docs/DESIGN.md](docs/DESIGN.md) and the scope in
 Requires macOS and Python 3.11 or newer.
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
 usb-bouncer list
 ```
 
@@ -77,6 +90,17 @@ from a vendored copy of the public USB ID list from linux-usb.org
 
 ## Development
 
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev,hid]"
+ruff check . && pyright && pytest
+```
+
+A release is cut by pushing a `v*` tag that matches the package version. The
+release workflow reruns the checks, builds the wheel and sdist, and attaches
+them to a GitHub Release.
+
+
 The protected branch requires the fixed `ci-ok` check to pass and requires the
 branch to be up to date before merging. Force-pushes and deletion are
 disallowed, and `enforce_admins` is off so an administrator override remains
@@ -93,3 +117,8 @@ rule also drops the PR requirement; I accepted that rather than route around
 the UI. I still follow one issue, one branch, one PR, comment-based
 self-review, and squash merges. That workflow is a convention I practise, not a
 control this repository enforces.
+
+## License
+
+MIT. See [LICENSE](LICENSE). `src/usb_bouncer/data/usb_ids.txt` is the public
+USB ID list maintained at linux-usb.org and is redistributed unmodified.
