@@ -1,5 +1,8 @@
 """Render devices for a human reading a terminal."""
 
+import subprocess
+from datetime import datetime
+
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
@@ -65,3 +68,55 @@ def print_verdicts(verdicts: list[Verdict]) -> None:
         )
     Console().print(table)
     Console().print("GREEN means nothing scored high enough to flag. It does not mean the device is safe.", style="dim")
+
+
+def _stamp() -> str:
+    return datetime.now().strftime("%H:%M:%S")
+
+
+def print_attach(v: Verdict) -> None:
+    line = Text.assemble(
+        f"{_stamp()}  ",
+        (f"{v.level:<6}", _STYLE[v.level]),
+        "  attached  ",
+        _cell(v.device.name),
+        f"  {_hex_id(v.device.vendor_id)}:{_hex_id(v.device.product_id)}",
+        f"  {', '.join(v.fired)}" if v.fired else "",
+    )
+    Console().print(line)
+
+
+def print_detach(d: Device) -> None:
+    line = Text.assemble(
+        f"{_stamp()}  {'':<6}  detached  ",
+        _cell(d.name),
+        f"  {_hex_id(d.vendor_id)}:{_hex_id(d.product_id)}",
+    )
+    Console().print(line, style="dim")
+
+
+def print_alert(message: str) -> None:
+    Console().print(Text(f"{_stamp()}  RED     {message}", style=_STYLE["RED"]))
+
+
+_NOTIFY = """on run argv
+display notification (item 2 of argv) with title (item 1 of argv)
+end run"""
+
+
+def notify(title: str, body: str) -> bool:
+    """Post a macOS notification. Best effort: a failure never stops the watch.
+
+    The text goes in as arguments, not spliced into the script. A device picks
+    its own name, and a name with a quote in it would otherwise be AppleScript.
+    """
+    try:
+        done = subprocess.run(
+            ["/usr/bin/osascript", "-e", _NOTIFY, title, body],
+            capture_output=True,
+            check=False,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return done.returncode == 0

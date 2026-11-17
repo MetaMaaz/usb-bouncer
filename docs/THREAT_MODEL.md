@@ -171,24 +171,31 @@ The keystroke-timing detector installs a `CGEventTap` on the global key-down
 event stream. **Mechanically, this is the same primitive a keylogger uses**, and
 that fact deserves to be stated plainly rather than buried.
 
+The tap exists only while `usb-bouncer watch --hid` is running. Without
+`--hid` no tap is created and the permission is never requested.
+
 The detector records **only the arrival timestamp of each key-down event**, in a
 fixed-size ring buffer. Old timestamps get overwritten as new ones arrive, so
-the buffer never grows and no input history builds up across a run. It never
+the buffer never grows and no input history builds up across a run. It reads two
+fields from each event, the timestamp and the auto-repeat flag. It never
 reads `kCGKeyboardEventKeycode`, never writes event data to disk, never
 transmits it, and never puts typed content in a report. The tap runs in
 listen-only mode, so it cannot modify, suppress, or inject events.
 
-The detector needs macOS Accessibility permission, the OS gate for this kind of
-global tap. That is a serious permission to hand out. Grant it only to a build
+The detector needs the macOS permission that gates listening to global key
+events. For a listen-only tap that is Input Monitoring; Accessibility is the
+gate for taps that can modify events. That is a serious permission to hand out. Grant it only to a build
 you trust, and revoke it when you are not running timing analysis.
 
 Reading the source and installing the tool are two different trust decisions.
 The source is there to inspect. A wheel pulled from a package index is not the
 thing you inspected. usb-bouncer does not ship as a signed application bundle,
-so the Accessibility prompt names an executable and gives you no code-signing
+so the permission prompt names an executable and gives you no code-signing
 identity to check against the source you read. Install from a published package
 and you are trusting the distribution path as well as the code.
 
-Nothing in the test suite enforces any of this today. No test fails if a future
-change starts reading keycodes. Until that test exists, the privacy property
-rests on source inspection rather than on anything mechanical.
+One part of this is enforced mechanically. A test fails if the constant
+`kCGKeyboardEventKeycode` appears anywhere in the package, and the detector
+cannot ask macOS which key was pressed without naming it. The test checks a
+name, not behaviour: it would not catch code that built the constant's numeric
+value by hand. The rest of this section still rests on source inspection.
