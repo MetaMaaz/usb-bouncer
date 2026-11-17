@@ -18,7 +18,7 @@ The interfaces field exists in v0.1 even though it stays empty, because it fixes
 
 fingerprint() is a correlation key, not a security identity. It lets an analyst group repeated events for a device with the same reported VID, PID, serial, and location: a device that keeps reappearing stands out, one already cleared can be filtered away. It must not be used to authenticate or allowlist a device. These values are all device-supplied, and an attacker who clones a legitimate device's identifiers produces a matching fingerprint. Treat it as a trusted identity and the tool becomes worse than useless.
 
-has_storage cannot be observed in v0.1. system_profiler SPUSBHostDataType reports no field indicating whether a device presents mass storage, and it does not expose bInterfaceClass, the descriptor value that would say so directly (0x08 for storage, 0x03 for HID). The field remains on Device for the same reason as interfaces: fixing the model's shape early lets v0.2 populate it without changing rule signatures. storage_and_hid cannot fire in v0.1. Setting has_storage = False for a mounted drive says the device is not storage when it is, which conflates unobserved with absent; that is accepted for now because no v0.1 behaviour reads the field, and the distinction becomes load-bearing when ioreg populates interface data and a rule reads it.
+has_storage cannot be observed from system_profiler. system_profiler SPUSBHostDataType reports no field indicating whether a device presents mass storage, and it does not expose bInterfaceClass, the descriptor value that would say so directly (0x08 for storage, 0x03 for HID). The field remains on Device for the same reason as interfaces: fixing the model's shape early lets v0.2 populate it without changing rule signatures. The ioreg collector added in v0.2 sets it to true when a device declares a mass-storage interface (class 0x08). The field stays a plain bool. Under system_profiler, False means unobserved; under ioreg, False means the device declared no storage interface. Only the ioreg collector feeds the analyzer, so no rule ever reads the unobserved kind (issue #31).
 
 The model also states what it leaves out. It does not retain keycodes, raw USB descriptor bytes, or timing histories beyond what each feature needs to reach its decision. That keeps the privacy boundary concrete and auditable, and marks the tool as a narrowly scoped device monitor rather than a full USB forensic collector.
 
@@ -28,7 +28,7 @@ usb-bouncer starts by polling system_profiler rather than going directly to IOKi
 
 This first source is the weakest of the three, and that is an acceptable starting point because of what it buys in testability. It reports device information but not reliable USB interface-class descriptors. It cannot establish whether a device presents both mass-storage and HID interfaces, and it reports no storage indicator either, so has_storage stays unpopulated in v0.1. The cost is polling latency: a device can be connected for some time before the next poll notices it. Polling also produces snapshots rather than lifecycle events, so usb-bouncer infers attachment and removal by comparing each snapshot against the previous one.
 
-The v0.2 stage moves to ioreg, which fills the specific gap system_profiler leaves: it exposes bInterfaceClass values. Rules such as storage-plus-HID can then reason about what a device actually declares, which is what brings them into service for the first time. The reason this is its own stage, rather than jumping straight to IOKit, is that ioreg is still pollable and dependency-free. It closes the data gap without taking on the real-time, pyobjc-based complexity that v0.3 introduces.
+The v0.2 stage moves to ioreg, which fills the specific gap system_profiler leaves: it exposes bInterfaceClass values. The command is ioreg -r -c IOUSBHostDevice -l -a, which returns each device as a property-list dict with its IOUSBHostInterface nodes below it. The IOUSB plane (ioreg -p IOUSB) lists devices only and carries no interface nodes, so it is not enough. ioreg also returns the device's own manufacturer string, which system_profiler does not, and it answered in about 50 ms on the CI runner, which matters once the tool polls. The scan command reads ioreg alone; list still reads system_profiler. Rules such as storage-plus-HID can then reason about what a device actually declares, which is what brings them into service for the first time. The reason this is its own stage, rather than jumping straight to IOKit, is that ioreg is still pollable and dependency-free. It closes the data gap without taking on the real-time, pyobjc-based complexity that v0.3 introduces.
 
 IOKit is the final stage. It provides real-time attach and detach notifications, which removes polling delay and ends the need to infer lifecycle changes from snapshot diffs.
 
@@ -42,7 +42,7 @@ Instead, rules.yaml carries metadata: each rule's weight, description, ATT&CK id
 
 This fixes the set of behaviours the tool can perform at code-review time. Configuration can enable, disable, and weight rules, but it cannot introduce a behaviour that is not already in the reviewed codebase.
 
-The reference analyzer currently skips a YAML rule that has no registered function: the lookup returns nothing and analysis continues. That is a limitation, not validation. A later version could check the YAML and registry IDs at startup and fail on any mismatch, but the design should not claim that behaviour until it exists.
+Loading the rules fails if the YAML names a rule with no registered function. Skipping it would let a typo in the config switch a detection off without anyone noticing. A test checks the other direction: every registered check has an entry in the packaged rules.yaml.
 
 The split also keeps testing simple. Each check function can be unit-tested against a small constructed Device fixture, without parsing YAML or running the full analyzer. Separate tests cover the metadata, enabled flags, weights, and result assembly. Configuration changes cannot alter rule logic; they only decide whether a reviewed rule runs and how its finding is scored and reported.
 
@@ -59,3 +59,19 @@ ts uses ISO-8601 UTC so timestamps are unambiguous across hosts, time zones, day
 The nested device block carries the device fingerprint as a correlation key. As covered in the device data model, it lets analysts group repeated connections from the same reported attributes, spot a recurring device, and avoid reinvestigating one they have already cleared. It is not authentication or proof of physical identity: its inputs are device-reported and can be cloned or spoofed.
 
 Together, the line-per-event structure and the stable schema make direct SIEM ingestion predictable. An analyst can query for high-score device attachments on a host, or group events by fingerprint and ATT&CK ID to chase down recurring activity.
+
+The log file is created with mode 0600 inside a 0700 directory, because device serial numbers are in it. Records are written with json.dumps, which escapes quotes and control characters, so a device that names itself with a newline cannot forge a second log line.
+
+## Rules shipped in v0.2
+
+| Rule | Weight | Fires when |
+|---|---|---|
+| storage_and_hid | 6 | the device declares both a mass-storage (0x08) and an HID (0x03) interface |
+| unknown_vendor | 2 | the vendor ID is not in the vendored usb.ids list |
+| missing_serial | 1 | the serial is absent, empty, all zeroes, or the macOS placeholder "Not Provided" |
+| too_many_interfaces | 1 | the device declares more than five interfaces |
+| vendor_string_mismatch | 2, disabled | the manufacturer string shares no word with the usb.ids vendor name |
+
+A score of 3 is YELLOW and 6 is RED. storage_and_hid is the only rule that reaches RED alone. missing_serial is weighted at 1 because most legitimate devices have no serial: 11 of the 12 devices on a Dell dock report none. vendor_string_mismatch ships disabled because it fires on real hardware. A SanDisk drive with VID 0x0781 reports its manufacturer as " USB", and docks built on third-party silicon carry the chip maker's VID with the dock maker's name. It can be enabled in rules.yaml by anyone who wants the noise.
+
+usb_ids.txt is a point-in-time copy of the public USB ID list (version 2026.06.26). A vendor registered after that date reads as unknown until the file is refreshed.

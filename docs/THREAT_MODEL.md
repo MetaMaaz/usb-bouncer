@@ -90,16 +90,18 @@ A device exposing both mass-storage (0x08) and HID (0x03) interfaces: it mounts
 as a legitimate drive to allay suspicion, while the HID interface delivers the
 payload. This is the flagship rule.
 
-*Detection:* interface-class enumeration. See §6 — this rule is cannot fire until v0.2.0.
+*Detection:* interface-class enumeration through `ioreg`, from v0.2.0. A device declaring both classes scores RED on that rule alone.
 
 ### 4.4 VID/PID spoofing and descriptor inconsistency — T1200
 
 A device claims a Vendor ID belonging to a reputable manufacturer while its
 descriptor strings, serial number, or interface layout contradict that claim.
 
-*Detection:* cross-checking the claimed VID against the public USB ID database,
-comparing the resolved vendor name against the device's own manufacturer string,
-and flagging missing or all-zero serial numbers.
+*Detection:* cross-checking the claimed VID against the public USB ID database
+and flagging missing, placeholder, or all-zero serial numbers. Comparing the
+vendor name against the device's own manufacturer string is implemented but
+disabled by default, because it fires on legitimate hardware: a SanDisk drive
+reports its manufacturer as " USB".
 
 ## 5. Out of scope
 
@@ -135,14 +137,14 @@ detector sees a fast but human typist. Every indicator this tool relies on is
 attacker-controlled data. That is the fundamental ceiling of descriptor-based
 detection, and no amount of rule-tuning raises it.
 
-**The flagship rule cannot fire in v0.1.0.** `system_profiler
+**The flagship rule only fires through `scan`.** `system_profiler
 SPUSBHostDataType` returns device-level fields (VID, PID, serial number, link
 speed, location) but exposes no `bInterfaceClass` values and no indicator that a
 device presents mass storage. The "storage-class device that also presents HID"
-rule therefore has neither of its inputs from this source. v0.1.0 scopes to the checks that data supports; v0.2.0
-adds an `ioreg`-based interface enumerator to unlock it. `rules.yaml` will carry
-the rule from the start, correctly weighted, so the gap stays visible in the
-config rather than hidden in the code.
+rule therefore has neither of its inputs from this source. The `list` command
+still reads `system_profiler` and reports descriptors without judging them.
+`scan` reads `ioreg`, which does expose interface classes, and is the only
+command that produces verdicts.
 
 **The timing detector has an irreducible false-positive rate.** Fast human
 typists, key-repeat, IDE autocomplete, and paste-like input from other tools can

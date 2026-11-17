@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from usb_bouncer import cli, monitor
-from usb_bouncer.model import Device
+from usb_bouncer import cli, events, ioreg, monitor
+from usb_bouncer.model import Device, UsbInterface
 from usb_bouncer.reporter import print_table
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -65,3 +65,18 @@ def test_zero_id_is_shown_and_missing_id_is_not_invented(capsys):
     out = capsys.readouterr().out
     assert "0x0000" in out
     assert "0xc077" not in out
+
+
+def test_scan_scores_logs_and_reports(monkeypatch, capsys, tmp_path):
+    badusb = _device(name="Flash", interfaces=(UsbInterface(0x08, 6, 80), UsbInterface(0x03, 1, 1)))
+    monkeypatch.setattr(ioreg, "list_devices", lambda: [badusb, _device()])
+    monkeypatch.setattr(events, "LOG", tmp_path / "events.jsonl")
+
+    assert cli.main(["scan", "--json"]) == 0
+    report = json.loads(capsys.readouterr().out)
+    assert [r["verdict"] for r in report] == ["RED", "GREEN"]
+    assert len((tmp_path / "events.jsonl").read_text().splitlines()) == 2
+
+    assert cli.main(["scan", "--no-log"]) == 0
+    assert "RED" in capsys.readouterr().out
+    assert len((tmp_path / "events.jsonl").read_text().splitlines()) == 2

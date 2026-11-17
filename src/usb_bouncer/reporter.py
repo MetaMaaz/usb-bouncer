@@ -4,6 +4,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
+from .analyzer import Verdict
 from .model import Device
 
 _MISSING = "-"
@@ -42,3 +43,25 @@ def print_table(devices: list[Device]) -> None:
             _cell(d.location_id),
         )
     Console().print(table)
+
+
+_STYLE = {"GREEN": "green", "YELLOW": "yellow", "RED": "bold red"}
+
+
+def print_verdicts(verdicts: list[Verdict]) -> None:
+    """Print one scored row per device to stdout."""
+    table = Table(title=f"USB device verdicts ({len(verdicts)})")
+    for column in ("Verdict", "Score", "Name", "VID", "PID", "Vendor", "Rules fired"):
+        table.add_column(column)
+    for v in verdicts:
+        table.add_row(
+            Text(v.level, style=_STYLE[v.level]),
+            str(v.score),
+            _cell(v.device.name),
+            _hex_id(v.device.vendor_id),
+            _hex_id(v.device.product_id),
+            _cell(v.device.vendor_name),
+            ", ".join(v.fired) or _MISSING,
+        )
+    Console().print(table)
+    Console().print("GREEN means nothing scored high enough to flag. It does not mean the device is safe.", style="dim")

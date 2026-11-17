@@ -1,0 +1,35 @@
+# Rule metadata only. The checks themselves are Python functions in
+# analyzer.py, registered under these ids. This file can enable, disable and
+# weight a reviewed check. It cannot add behaviour.
+version: 1
+thresholds: # total score -> verdict
+  yellow: 3
+  red: 6
+rules:
+  - id: storage_and_hid
+    description: "Presents both mass-storage and HID interfaces (classic BadUSB)"
+    weight: 6
+    attack_ids: ["T1200", "T1091"]
+    enabled: true
+  - id: unknown_vendor
+    description: "Vendor ID is not in the public USB ID list"
+    weight: 2
+    attack_ids: ["T1200"]
+    enabled: true
+  - id: missing_serial
+    description: "Serial number is missing, a placeholder, or all zeroes"
+    weight: 1
+    attack_ids: ["T1200"]
+    enabled: true
+  - id: too_many_interfaces
+    description: "Presents more interfaces than a simple device needs"
+    weight: 1
+    attack_ids: ["T1200"]
+    enabled: true
+  - id: vendor_string_mismatch
+    description: "Manufacturer string shares no word with the vendor the VID belongs to"
+    weight: 2
+    attack_ids: ["T1200"]
+    # Off by default: fires on real hardware. A SanDisk drive (VID 0x0781)
+    # reports its manufacturer as " USB". See issue #30.
+    enabled: false
