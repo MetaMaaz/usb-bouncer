@@ -1,5 +1,7 @@
 """Tests for the device model."""
 
+import pytest
+
 from usb_bouncer.model import Device, UsbInterface
 
 
@@ -30,3 +32,9 @@ def test_device_is_hashable():
     # Devices in sets to work out what attached and detached between polls
     d = _device(interfaces=(UsbInterface(0x03, 0x00, 0x00),))
     assert len({d, _device()}) == 2
+
+def test_interface_fields_have_no_defaults():
+    # a default of None would let a parser drop interface_class silently, and
+    # storage_and_hid would then read a composite device as clean
+    with pytest.raises(TypeError):
+        UsbInterface(interface_class=0x03)  # pyright: ignore[reportCallIssue]
