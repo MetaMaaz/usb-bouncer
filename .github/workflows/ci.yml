@@ -26,30 +26,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install
         run: pip install -e ".[dev,hid]"
-      - name: DEBUG tap timestamps
-        run: |
-          python - <<'PY'
-          import Quartz as q, time
-          rows = []
-          def cb(proxy, etype, event, refcon):
-              rows.append((etype, q.CGEventGetTimestamp(event), q.CGEventGetIntegerValueField(event, q.kCGKeyboardEventAutorepeat), time.monotonic()))
-              return event
-          tap = q.CGEventTapCreate(q.kCGSessionEventTap, q.kCGHeadInsertEventTap, q.kCGEventTapOptionListenOnly, q.CGEventMaskBit(q.kCGEventKeyDown), cb, None)
-          src = q.CFMachPortCreateRunLoopSource(None, tap, 0)
-          q.CFRunLoopAddSource(q.CFRunLoopGetCurrent(), src, q.kCFRunLoopCommonModes)
-          q.CGEventTapEnable(tap, True)
-          for gap in (0.08, 0.005):
-              t0 = time.monotonic()
-              for i in range(12):
-                  for down in (True, False):
-                      q.CGEventPost(q.kCGHIDEventTap, q.CGEventCreateKeyboardEvent(None, 0, down))
-                  time.sleep(gap)
-              print("posted in", time.monotonic() - t0)
-              q.CFRunLoopRunInMode(q.kCFRunLoopDefaultMode, 0.5, False)
-              print("DBG gap", gap, "n", len(rows))
-              for r in rows: print("DBG", r)
-              rows.clear()
-          PY
       - name: Test
         run: pytest --cov=usb_bouncer --cov-report=term-missing --cov-report=xml
       - name: Smoke test the installed command
