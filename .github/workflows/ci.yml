@@ -25,13 +25,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,hid]"
       - name: Test
         run: pytest --cov=usb_bouncer --cov-report=term-missing --cov-report=xml
       - name: Smoke test the installed command
         run: |
           usb-bouncer list
           usb-bouncer scan --no-log
+          usb-bouncer watch --hid --polls 2 --no-log
       - name: Coverage summary
         if: matrix.python-version == '3.11'
         run: |
@@ -46,7 +47,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,hid]"
       - name: Lint
         run: ruff check .
       - name: Type check

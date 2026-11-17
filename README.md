@@ -6,8 +6,8 @@ macOS tool that vets unknown USB devices for BadUSB red flags and keystroke inje
 
 `list` shows connected USB devices with the descriptors macOS reports for
 them. `scan` scores each device against a set of rules and gives a GREEN,
-YELLOW or RED verdict. Real-time monitoring arrives in v0.3 and the
-keystroke-timing detector in v0.4. The
+YELLOW or RED verdict. `watch` keeps running, scores each device as it
+attaches, and can watch keystroke timing for injection. The
 design is in [docs/DESIGN.md](docs/DESIGN.md) and the scope in
 [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md).
 
@@ -51,6 +51,25 @@ per line, tagged with MITRE ATT&CK technique IDs, ready for a SIEM to ingest:
 ```json
 {"ts": "2026-11-17T00:50:11Z", "event": "device_verdict", "device": {"fingerprint": "a1b2c3d4e5f6a7b8", "name": "Flash", "vendor_id": "0x0781", "product_id": "0x5581", "vendor_name": "SanDisk Corp.", "serial": null}, "verdict": "RED", "score": 7, "rules_fired": ["storage_and_hid", "missing_serial"], "attack_ids": ["T1091", "T1200"], "host": "macbook"}
 ```
+
+```bash
+usb-bouncer watch           # score devices as they attach, notify on RED
+usb-bouncer watch --hid     # also flag machine-speed typing
+```
+
+`watch` polls once a second, so a device is noticed up to a second after it
+attaches. A RED verdict posts a macOS notification.
+
+`--hid` adds the keystroke-timing detector. It needs the optional dependency
+(`pip install -e ".[dev,hid]"`) and the Input Monitoring permission for your
+terminal, under System Settings > Privacy & Security. It flags a run of ten
+keystrokes whose median gap is under 40 ms, which a script does and a person
+does not. Tune it with `--hid-threshold-ms` and `--hid-window`.
+
+The detector installs a global key-event tap, the same primitive a keylogger
+uses. It records when keys go down and never which keys: the key code is never
+read, and a test fails if the constant for it appears in the package. See
+[section 7 of the threat model](docs/THREAT_MODEL.md).
 
 Rules and weights live in `src/usb_bouncer/data/rules.yaml`. Vendor names come
 from a vendored copy of the public USB ID list from linux-usb.org
