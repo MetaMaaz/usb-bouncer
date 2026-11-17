@@ -7,6 +7,8 @@ this package. See THREAT_MODEL.md section 7.
 """
 
 import importlib
+import queue
+import threading
 from collections import deque
 from collections.abc import Callable
 from itertools import pairwise
@@ -40,22 +42,29 @@ class BurstDetector:
         return gap
 
 
-def start(on_key: Callable[[float], None]) -> Callable[[float], None]:
-    """Install a listen-only key-down tap. Return pump(seconds), which runs it.
+def start() -> Callable[[], list[float]]:
+    """Install a listen-only key-down tap. Return drain(), which hands back the
+    key-down timestamps (seconds) collected since it was last called.
+
+    The tap runs on its own thread and its callback only queues a number.
+    macOS switches off a tap that is slow to answer and drops keystrokes
+    until it is switched back on, so the callback must never wait on a poll,
+    a log write or a notification.
 
     Raises ImportError without pyobjc (install usb-bouncer[hid]) and
     RuntimeError when macOS refuses the tap.
     """
     q: Any = importlib.import_module("Quartz")
+    stamps: queue.SimpleQueue[float] = queue.SimpleQueue()
 
     def callback(_proxy, event_type, event, _refcon):
         if event_type == q.kCGEventKeyDown:
             # a held key repeats at about 33 ms, under the threshold, so repeats are skipped
             if not q.CGEventGetIntegerValueField(event, q.kCGKeyboardEventAutorepeat):
-                # the event's own timestamp, so events queued behind a slow poll keep their spacing
-                on_key(q.CGEventGetTimestamp(event) / 1e9)
+                # the event's own timestamp (nanoseconds), not the time this callback ran
+                stamps.put(q.CGEventGetTimestamp(event) / 1e9)
         elif event_type in (q.kCGEventTapDisabledByTimeout, q.kCGEventTapDisabledByUserInput):
-            q.CGEventTapEnable(tap, True)  # macOS switches a slow tap off; switch it back on
+            q.CGEventTapEnable(tap, True)
         return event
 
     tap = q.CGEventTapCreate(
@@ -71,11 +80,19 @@ def start(on_key: Callable[[float], None]) -> Callable[[float], None]:
             "macOS refused the keyboard event tap. Allow this terminal under System Settings > "
             "Privacy & Security > Input Monitoring (Accessibility on older macOS), then rerun."
         )
-    source = q.CFMachPortCreateRunLoopSource(None, tap, 0)
-    q.CFRunLoopAddSource(q.CFRunLoopGetCurrent(), source, q.kCFRunLoopCommonModes)
-    q.CGEventTapEnable(tap, True)
 
-    def pump(seconds: float) -> None:
-        q.CFRunLoopRunInMode(q.kCFRunLoopDefaultMode, seconds, False)
+    def run_tap() -> None:
+        source = q.CFMachPortCreateRunLoopSource(None, tap, 0)
+        q.CFRunLoopAddSource(q.CFRunLoopGetCurrent(), source, q.kCFRunLoopCommonModes)
+        q.CGEventTapEnable(tap, True)
+        q.CFRunLoopRun()
 
-    return pump
+    threading.Thread(target=run_tap, name="usb-bouncer-hid-tap", daemon=True).start()
+
+    def drain() -> list[float]:
+        out = []
+        while not stamps.empty():
+            out.append(stamps.get())
+        return out
+
+    return drain

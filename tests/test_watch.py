@@ -121,7 +121,7 @@ def test_watch_command_logs_verdicts_and_notifies_on_red(monkeypatch, capsys, tm
 
 
 def test_hid_flag_without_pyobjc_fails_with_install_hint(monkeypatch, capsys):
-    def no_quartz(on_key):
+    def no_quartz():
         raise ImportError("No module named 'Quartz'")
 
     monkeypatch.setattr(hid_watch, "start", no_quartz)
@@ -135,13 +135,18 @@ def test_notification_text_is_passed_as_arguments():
     assert reporter.notify("usb-bouncer test", 'name with "quotes" and \\ backslash')
 
 
-def _type(quartz, pump, keys: int, gap_s: float) -> None:
+def _type(quartz, keys: int, gap_s: float) -> None:
     for _ in range(keys):
         for down in (True, False):
             event = quartz.CGEventCreateKeyboardEvent(None, 0, down)
             quartz.CGEventPost(quartz.kCGHIDEventTap, event)
         time.sleep(gap_s)
-    pump(0.5)
+    time.sleep(0.5)  # let the tap thread receive the tail
+
+
+def _alerts(timestamps: list[float]) -> list[float]:
+    detector = BurstDetector()
+    return [gap for t in timestamps if (gap := detector.add(t)) is not None]
 
 
 @macos_only
@@ -150,18 +155,15 @@ def test_real_event_tap_separates_injection_from_slow_typing():
     # read back through the listen-only tap. The slow run is the control: it
     # fails if event timestamps are not in the unit the detector assumes.
     quartz = pytest.importorskip("Quartz")
-    detector = BurstDetector()
-    alerts: list[float] = []
+    drain = hid_watch.start()
+    time.sleep(0.2)  # let the tap thread enable the tap
 
-    def on_key(timestamp: float) -> None:
-        if (gap := detector.add(timestamp)) is not None:
-            alerts.append(gap)
+    _type(quartz, keys=12, gap_s=0.08)
+    slow = drain()
+    assert len(slow) == 12  # nothing dropped while this thread was busy posting
+    assert _alerts(slow) == []
 
-    pump = hid_watch.start(on_key)
-
-    _type(quartz, pump, keys=12, gap_s=0.08)
-    assert alerts == []
-
-    _type(quartz, pump, keys=12, gap_s=0.005)
-    assert len(alerts) == 1
-    assert alerts[0] < 0.040
+    _type(quartz, keys=12, gap_s=0)
+    fast = drain()
+    assert len(fast) == 12
+    assert len(_alerts(fast)) == 1

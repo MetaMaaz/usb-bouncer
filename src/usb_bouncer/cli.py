@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 from collections import deque
-from functools import partial
+from collections.abc import Callable
 
 from . import __version__, analyzer, events, hid_watch, ioreg, monitor, reporter, usb_ids
 from .model import Device
@@ -81,12 +81,16 @@ def _watch(args: argparse.Namespace) -> int:
         reporter.print_alert(message)
         reporter.notify("usb-bouncer: keystroke injection", message)
 
-    wait = partial(time.sleep, args.interval)
+    def wait() -> None:
+        time.sleep(args.interval)
+        for timestamp in drain():
+            on_key(timestamp)
+
+    drain: Callable[[], list[float]] = list  # no tap, nothing to drain
     if args.hid:
         try:
             detector = hid_watch.BurstDetector(args.hid_window, args.hid_threshold_ms / 1000)
-            # with --hid the wait between polls is spent running the event tap
-            wait = partial(hid_watch.start(on_key), args.interval)
+            drain = hid_watch.start()
         except ImportError:
             print('usb-bouncer: --hid needs pyobjc: pip install "usb-bouncer[hid]"', file=sys.stderr)
             return 1
