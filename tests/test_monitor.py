@@ -6,11 +6,12 @@ read than a file you have to open.
 """
 
 import json
+import sys
 from pathlib import Path
 
 import pytest
 
-from usb_bouncer.monitor import parse_snapshot
+from usb_bouncer.monitor import list_devices, parse_snapshot
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -156,3 +157,10 @@ def test_placeholder_serials_are_recorded_verbatim():
     placeholders = [d for d in devices if d.serial == "Not Provided"]
     assert len(placeholders) == 10
     assert all(d.serial is not None for d in devices)
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="system_profiler is macOS-only")
+def test_list_devices_runs_the_real_command():
+    # the only test that touches the OS: proves the absolute path and the
+    # data type name are right on the machine running the suite
+    assert isinstance(list_devices(), list)

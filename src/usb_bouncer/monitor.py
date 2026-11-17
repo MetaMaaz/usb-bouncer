@@ -14,7 +14,8 @@ from .model import Device
 def _snapshot_json() -> dict:
     """Run system_profiler and return its parsed JSON output."""
     out = subprocess.run(
-        ["system_profiler", "SPUSBHostDataType", "-json"],
+        # absolute path: a security tool should not run whatever PATH resolves
+        ["/usr/sbin/system_profiler", "SPUSBHostDataType", "-json"],
         capture_output=True,
         text=True,
         check=True,
