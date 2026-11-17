@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>IOObjectClass</key>
+		<string>IOUSBHostDevice</string>
+		<key>IORegistryEntryChildren</key>
+		<array>
+			<dict>
+				<key>IOObjectClass</key>
+				<string>AppleUSBHostCompositeDevice</string>
+				<key>IORegistryEntryID</key>
+				<integer>4294967937</integer>
+				<key>IORegistryEntryName</key>
+				<string>AppleUSBHostCompositeDevice</string>
+				<key>bDeviceClass</key>
+				<integer>0</integer>
+				<key>bDeviceSubClass</key>
+				<integer>0</integer>
+			</dict>
+			<dict>
+				<key>IOObjectClass</key>
+				<string>IOUSBHostInterface</string>
+				<key>IORegistryEntryChildren</key>
+				<array>
+					<dict>
+						<key>IOObjectClass</key>
+						<string>AppleUserHIDDevice</string>
+						<key>IORegistryEntryChildren</key>
+						<array>
+							<dict>
+								<key>IOObjectClass</key>
+								<string>IOHIDInterface</string>
+								<key>IORegistryEntryChildren</key>
+								<array>
+									<dict>
+										<key>IOObjectClass</key>
+										<string>AppleUserHIDEventService</string>
+										<key>IORegistryEntryChildren</key>
+										<array>
+											<dict>
+												<key>IOObjectClass</key>
+												<string>IOHIDEventServiceUserClient</string>
+												<key>IORegistryEntryID</key>
+												<integer>4294968061</integer>
+												<key>IORegistryEntryName</key>
+												<string>IOHIDEventServiceUserClient</string>
+											</dict>
+										</array>
+										<key>IORegistryEntryID</key>
+										<integer>4294968057</integer>
+										<key>IORegistryEntryName</key>
+										<string>AppleUserHIDEventDriver</string>
+									</dict>
+								</array>
+								<key>IORegistryEntryID</key>
+								<integer>4294968051</integer>
+								<key>IORegistryEntryName</key>
+								<string>IOHIDInterface</string>
+							</dict>
+						</array>
+						<key>IORegistryEntryID</key>
+						<integer>4294968033</integer>
+						<key>IORegistryEntryName</key>
+						<string>AppleUserUSBHostHIDDevice</string>
+						<key>bInterfaceClass</key>
+						<integer>3</integer>
+						<key>bInterfaceProtocol</key>
+						<integer>1</integer>
+						<key>bInterfaceSubClass</key>
+						<integer>1</integer>
+					</dict>
+				</array>
+				<key>IORegistryEntryID</key>
+				<integer>4294967938</integer>
+				<key>IORegistryEntryName</key>
+				<string>IOUSBHostInterface</string>
+				<key>USB Product Name</key>
+				<string>Virtual USB Keyboard</string>
+				<key>USB Vendor Name</key>
+				<string>Apple Inc.</string>
+				<key>bInterfaceClass</key>
+				<integer>3</integer>
+				<key>bInterfaceNumber</key>
+				<integer>0</integer>
+				<key>bInterfaceProtocol</key>
+				<integer>1</integer>
+				<key>bInterfaceSubClass</key>
+				<integer>1</integer>
+				<key>bcdDevice</key>
+				<integer>0</integer>
+				<key>idProduct</key>
+				<integer>33029</integer>
+				<key>idVendor</key>
+				<integer>1452</integer>
+				<key>locationID</key>
+				<integer>210763776</integer>
+			</dict>
+		</array>
+		<key>IORegistryEntryID</key>
+		<integer>4294967933</integer>
+		<key>IORegistryEntryName</key>
+		<string>Virtual USB Keyboard</string>
+		<key>USB Product Name</key>
+		<string>Virtual USB Keyboard</string>
+		<key>USB Vendor Name</key>
+		<string>Apple Inc.</string>
+		<key>bDeviceClass</key>
+		<integer>0</integer>
+		<key>bDeviceProtocol</key>
+		<integer>0</integer>
+		<key>bDeviceSubClass</key>
+		<integer>0</integer>
+		<key>bcdDevice</key>
+		<integer>0</integer>
+		<key>iManufacturer</key>
+		<integer>2</integer>
+		<key>iProduct</key>
+		<integer>3</integer>
+		<key>iSerialNumber</key>
+		<integer>0</integer>
+		<key>idProduct</key>
+		<integer>33029</integer>
+		<key>idVendor</key>
+		<integer>1452</integer>
+		<key>kUSBProductString</key>
+		<string>Virtual USB Keyboard</string>
+		<key>kUSBVendorString</key>
+		<string>Apple Inc.</string>
+		<key>locationID</key>
+		<integer>210763776</integer>
+	</dict>
+	<dict>
+		<key>IOObjectClass</key>
+		<string>IOUSBHostDevice</string>
+		<key>IORegistryEntryChildren</key>
+		<array>
+			<dict>
+				<key>IOObjectClass</key>
+				<string>AppleUSBHostCompositeDevice</string>
+				<key>IORegistryEntryID</key>
+				<integer>4294967945</integer>
+				<key>IORegistryEntryName</key>
+				<string>AppleUSBHostCompositeDevice</string>
+				<key>bDeviceClass</key>
+				<integer>0</integer>
+				<key>bDeviceSubClass</key>
+				<integer>0</integer>
+			</dict>
+			<dict>
+				<key>IOObjectClass</key>
+				<string>IOUSBHostInterface</string>
+				<key>IORegistryEntryChildren</key>
+				<array>
+					<dict>
+						<key>IOObjectClass</key>
+						<string>AppleUserHIDDevice</string>
+						<key>IORegistryEntryChildren</key>
+						<array>
+							<dict>
+								<key>IOObjectClass</key>
+								<string>IOHIDInterface</string>
+								<key>IORegistryEntryChildren</key>
+								<array>
+									<dict>
+										<key>IOObjectClass</key>
+										<string>AppleVirtualPlatformHIDEventDriver</string>
+										<key>IORegistryEntryChildren</key>
+										<array>
+											<dict>
+												<key>IOObjectClass</key>
+												<string>IOHIDEventServiceUserClient</string>
+												<key>IORegistryEntryID</key>
+												<integer>4294968056</integer>
+												<key>IORegistryEntryName</key>
+												<string>IOHIDEventServiceUserClient</string>
+											</dict>
+										</array>
+										<key>IORegistryEntryID</key>
+										<integer>4294968052</integer>
+										<key>IORegistryEntryName</key>
+										<string>AppleVirtualPlatformHIDEventDriver</string>
+									</dict>
+								</array>
+								<key>IORegistryEntryID</key>
+								<integer>4294968048</integer>
+								<key>IORegistryEntryName</key>
+								<string>IOHIDInterface</string>
+							</dict>
+						</array>
+						<key>IORegistryEntryID</key>
+						<integer>4294968031</integer>
+						<key>IORegistryEntryName</key>
+						<string>AppleUserUSBHostHIDDevice</string>
+						<key>bInterfaceClass</key>
+						<integer>3</integer>
+						<key>bInterfaceSubClass</key>
+						<integer>0</integer>
+					</dict>
+				</array>
+				<key>IORegistryEntryID</key>
+				<integer>4294967946</integer>
+				<key>IORegistryEntryName</key>
+				<string>IOUSBHostInterface</string>
+				<key>USB Product Name</key>
+				<string>Virtual USB Digitizer</string>
+				<key>USB Vendor Name</key>
+				<string>Apple Inc.</string>
+				<key>bInterfaceClass</key>
+				<integer>3</integer>
+				<key>bInterfaceNumber</key>
+				<integer>0</integer>
+				<key>bInterfaceProtocol</key>
+				<integer>0</integer>
+				<key>bInterfaceSubClass</key>
+				<integer>0</integer>
+				<key>bcdDevice</key>
+				<integer>0</integer>
+				<key>idProduct</key>
+				<integer>33030</integer>
+				<key>idVendor</key>
+				<integer>1452</integer>
+				<key>locationID</key>
+				<integer>211812352</integer>
+			</dict>
+		</array>
+		<key>IORegistryEntryID</key>
+		<integer>4294967941</integer>
+		<key>IORegistryEntryName</key>
+		<string>Virtual USB Digitizer</string>
+		<key>USB Product Name</key>
+		<string>Virtual USB Digitizer</string>
+		<key>USB Vendor Name</key>
+		<string>Apple Inc.</string>
+		<key>bDeviceClass</key>
+		<integer>0</integer>
+		<key>bDeviceProtocol</key>
+		<integer>0</integer>
+		<key>bDeviceSubClass</key>
+		<integer>0</integer>
+		<key>bcdDevice</key>
+		<integer>0</integer>
+		<key>iManufacturer</key>
+		<integer>2</integer>
+		<key>iProduct</key>
+		<integer>3</integer>
+		<key>iSerialNumber</key>
+		<integer>0</integer>
+		<key>idProduct</key>
+		<integer>33030</integer>
+		<key>idVendor</key>
+		<integer>1452</integer>
+		<key>kUSBProductString</key>
+		<string>Virtual USB Digitizer</string>
+		<key>kUSBVendorString</key>
+		<string>Apple Inc.</string>
+		<key>locationID</key>
+		<integer>211812352</integer>
+	</dict>
+</array>
+</plist>

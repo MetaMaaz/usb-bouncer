@@ -29,7 +29,9 @@ jobs:
       - name: Test
         run: pytest --cov=usb_bouncer --cov-report=term-missing --cov-report=xml
       - name: Smoke test the installed command
-        run: usb-bouncer list
+        run: |
+          usb-bouncer list
+          usb-bouncer scan --no-log
       - name: Coverage summary
         if: matrix.python-version == '3.11'
         run: |

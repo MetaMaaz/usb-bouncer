@@ -2,6 +2,17 @@
 
 Captured with `system_profiler SPUSBHostDataType -json` on macOS, Apple silicon.
 
+`capture_ioreg_*.plist` files come from
+`ioreg -r -c IOUSBHostDevice -l -a -w 0`. Raw output is about 800 KB for two
+devices, nearly all of it driver diagnostics, so these captures are pruned to
+the registry structure (`IOObjectClass`, `IORegistryEntryName`,
+`IORegistryEntryID`, `IORegistryEntryChildren`) and the USB descriptor keys
+(`idVendor`, `idProduct`, `bcdDevice`, `locationID`, the `bDevice*` and
+`bInterface*` keys, the `i*` string indexes, and the product, vendor and
+serial strings). Values are unmodified. `capture_ioreg_virtual_hid.plist` is
+from a GitHub Actions macOS 26 runner, whose only USB devices are Apple's
+virtual keyboard and digitizer.
+
 Naming:
 
 - `capture_*` — real output with device serial numbers replaced by
