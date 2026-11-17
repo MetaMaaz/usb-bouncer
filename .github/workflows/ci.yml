@@ -52,6 +52,9 @@ jobs:
         run: ruff check .
       - name: Type check
         run: pyright
+      - name: Audit dependencies
+        # the project's own dependencies, not whatever the runner image ships
+        run: pip-audit .
 
   ci-ok:
     if: always()

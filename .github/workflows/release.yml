@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -e ".[dev,hid]" build
+      - name: Tag matches package version
+        run: test "v$(python -c 'import usb_bouncer; print(usb_bouncer.__version__)')" = "$GITHUB_REF_NAME"
+      - name: Test before release
+        run: |
+          ruff check .
+          pyright
+          pytest
+          pip-audit .
+      - name: Build wheel and sdist
+        run: python -m build
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # gh is preinstalled on the runner: no third-party action holds the token
+        run: gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --generate-notes

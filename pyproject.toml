@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "usb-bouncer"
-version = "0.4.0"
+version = "1.0.0"
 description = "macOS tool that vets unknown USB devices for BadUSB red flags and keystroke injection"
 requires-python = ">=3.11"
 readme = "README.md"
@@ -12,7 +12,7 @@ license = { text = "MIT" }
 dependencies = ["pyyaml>=6", "rich>=13"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-cov>=5", "ruff==0.17.5", "pyright>=1.1.400"]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff==0.17.5", "pyright>=1.1.400", "pip-audit>=2"]
 hid = ["pyobjc-framework-Quartz>=10"]
 
 [project.scripts]
