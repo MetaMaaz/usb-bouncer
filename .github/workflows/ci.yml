@@ -28,6 +28,8 @@ jobs:
         run: pip install -e ".[dev]"
       - name: Test
         run: pytest --cov=usb_bouncer --cov-report=term-missing --cov-report=xml
+      - name: Smoke test the installed command
+        run: usb-bouncer list
       - name: Coverage summary
         if: matrix.python-version == '3.11'
         run: |

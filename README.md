@@ -2,6 +2,37 @@
 
 macOS tool that vets unknown USB devices for BadUSB red flags and keystroke injection.
 
+## Status
+
+v0.1 lists connected USB devices with the descriptors macOS reports for them.
+It does not score or judge anything yet. Rules and verdicts arrive in v0.2,
+real-time monitoring in v0.3, and the keystroke-timing detector in v0.4. The
+design is in [docs/DESIGN.md](docs/DESIGN.md) and the scope in
+[docs/THREAT_MODEL.md](docs/THREAT_MODEL.md).
+
+## Usage
+
+Requires macOS and Python 3.11 or newer.
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+usb-bouncer list
+```
+
+```text
+┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Name             ┃ VID    ┃ PID    ┃ Serial       ┃ Version ┃ Location   ┃
+┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━┩
+│ Dell dock        │ 0x0bda │ 0x0487 │ Not Provided │ 0x0157  │ 0x01200000 │
+│ USB5744          │ 0x0424 │ 0x5744 │ Not Provided │ 0x0286  │ 0x01231000 │
+└──────────────────┴────────┴────────┴──────────────┴─────────┴────────────┘
+```
+
+Every value in the table is reported by the device or by macOS and is
+unverified. `Not Provided` is what macOS prints when a device supplies no
+serial number.
+
 ## Development
 
 The protected branch requires the fixed `ci-ok` check to pass and requires the
